@@ -25,4 +25,14 @@ public class GameTest {
         assertThat(game.score()).isEqualTo(20);
     }
 
+    @Test
+    public void testSpare() {
+        var game = new Game();
+
+        game.roll(7); game.roll(3); // spare
+        game.roll(3);
+
+        assertThat(game.score()).isEqualTo(16);
+    }
+
 }
