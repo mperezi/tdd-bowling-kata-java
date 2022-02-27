@@ -18,8 +18,6 @@ public class Game {
 
     int score = 0;
 
-    int currentTry = 1;
-
     public Game() {
         IntStream.range(0, TOTAL_FRAMES).forEach(i -> frames[i] = new Frame());
     }
@@ -27,20 +25,20 @@ public class Game {
     public void roll(int pinsDown) {
         if (lastFrameWasStrike()) {
             if (lastFrame2WasStrikeToo()) {
-                if (currentFrame().tries == 1) {
+                if (currentFrame().isFirstTry()) {
                     score += pinsDown;
                 }
             }
             score += pinsDown;
         }
-        if (lastFrameWasSpare() && currentFrame().tries == 1) {
+        if (lastFrameWasSpare() && currentFrame().isFirstTry()) {
             score += pinsDown;
         }
 
         currentFrame().roll(pinsDown);
         score += pinsDown;
 
-        advanceFrame(pinsDown);
+        advanceFrame();
     }
 
     private Frame currentFrame() {
@@ -59,21 +57,10 @@ public class Game {
         return prevFrame(currentFrameIndex - 1).map(Frame::isStrike).orElse(false);
     }
 
-    private void advanceFrame(int pinsDown) {
-        if (currentTry == 1) {
-            if (pinsDown < TOTAL_PINS) {
-                currentTry = 2;
-            } else {  // strike
-                resetFrame();
-            }
-        } else {
-            resetFrame();
+    private void advanceFrame() {
+        if (currentFrame().isStrike() || currentFrame().tries == 2) {
+            currentFrameIndex++;
         }
-    }
-
-    private void resetFrame() {
-        currentFrameIndex++;
-        currentTry = 1;
     }
 
     private Optional<Frame> prevFrame() {
@@ -94,13 +81,17 @@ public class Game {
 
         int pinsDown;
 
-        int tries = 1;
+        int tries;
 
         void roll(int pinsDown) {
             this.pinsDown += pinsDown;
-            if (tries < 2 && pinsDown < TOTAL_PINS) {
+            if (tries == 0 || pinsDown < TOTAL_PINS) {
                 tries++;
             }
+        }
+
+        boolean isFirstTry() {
+            return tries == 0;
         }
 
         boolean isSpare() {
