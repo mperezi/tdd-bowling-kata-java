@@ -1,17 +1,19 @@
 import com.example.kata.Game;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.util.stream.IntStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class GameTest {
 
     @Test
-    public void testWorstPlayer(){
+    public void testWorstPlayer() {
+        var game = new Game();
 
-        Game game = new Game();
-        for(int i=0; i<20; i++)
-            game.roll(0);
+        IntStream.rangeClosed(1, 20). forEach(v -> game.roll(0));
 
-        Assert.assertEquals(game.score(), 0);
+        assertThat(game.score()).isZero();
     }
 
 }
