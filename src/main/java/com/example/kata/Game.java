@@ -9,6 +9,10 @@ public class Game {
 
     int currentTry = 1;
 
+    int lastFrame2PinsDown;
+
+    int lastFrame2Tries;
+
     int lastFramePinsDown;
 
     int lastFrameTries;
@@ -16,6 +20,15 @@ public class Game {
     int currentFramePinsDown;
 
     public void roll(int pinsDown) {
+        if (lastFrameWasStrike()) {
+            if (lastFrame2WasStrikeToo()) {
+                if (currentTry == 1) {
+                    score += pinsDown;
+                }
+            } else {
+                score += pinsDown;
+            }
+        }
         if (lastFrameWasSpare() && currentTry == 1) {
             score += pinsDown;
         }
@@ -30,6 +43,14 @@ public class Game {
         return lastFramePinsDown == 10 && lastFrameTries == 2;
     }
 
+    private boolean lastFrameWasStrike() {
+        return lastFramePinsDown == 10 && lastFrameTries == 1;
+    }
+
+    private boolean lastFrame2WasStrikeToo() {
+        return lastFrame2PinsDown == 10 && lastFrameTries == 1;
+    }
+
     private void advanceFrame(int pinsDown) {
         if (currentTry == 1) {
             if (pinsDown < 10) {
@@ -42,11 +63,13 @@ public class Game {
         }
     }
 
-    private void resetFrame(int lastFrameTries) {
+    private void resetFrame(int tries) {
         currentTry = 1;
+        lastFrame2PinsDown = lastFramePinsDown;
         lastFramePinsDown = currentFramePinsDown;
+        lastFrame2Tries = lastFrameTries;
+        lastFrameTries = tries;
         currentFramePinsDown = 0;
-        this.lastFrameTries = lastFrameTries;
     }
 
     public int score() {
