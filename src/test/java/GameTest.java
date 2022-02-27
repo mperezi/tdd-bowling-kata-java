@@ -16,4 +16,13 @@ public class GameTest {
         assertThat(game.score()).isZero();
     }
 
+    @Test
+    public void testMostConsistentPlayer() {
+        var game = new Game();
+
+        IntStream.rangeClosed(1, 20). forEach(v -> game.roll(1));
+
+        assertThat(game.score()).isEqualTo(20);
+    }
+
 }
