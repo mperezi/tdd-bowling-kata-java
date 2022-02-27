@@ -46,4 +46,16 @@ public class GameTest {
         assertThat(game.score()).isEqualTo(22);
     }
 
+    @Test
+    public void testDoubleStrike() {
+        var game = new Game();
+
+        game.roll(10); // strike
+        game.roll(10); // double strike
+        game.roll(3);
+        game.roll(3);
+
+        assertThat(game.score()).isEqualTo(45);
+    }
+
 }

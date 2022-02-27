@@ -25,9 +25,8 @@ public class Game {
                 if (currentTry == 1) {
                     score += pinsDown;
                 }
-            } else {
-                score += pinsDown;
             }
+            score += pinsDown;
         }
         if (lastFrameWasSpare() && currentTry == 1) {
             score += pinsDown;
