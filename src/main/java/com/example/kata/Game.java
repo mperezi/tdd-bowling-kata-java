@@ -20,16 +20,6 @@ public class Game {
 
     int currentTry = 1;
 
-    int lastFrame2PinsDown;
-
-    int lastFrame2Tries;
-
-    int lastFramePinsDown;
-
-    int lastFrameTries;
-
-    int currentFramePinsDown;
-
     public Game() {
         IntStream.range(0, TOTAL_FRAMES).forEach(i -> frames[i] = new Frame());
     }
@@ -49,7 +39,6 @@ public class Game {
 
         currentFrame().roll(pinsDown);
         score += pinsDown;
-        currentFramePinsDown += pinsDown;
 
         advanceFrame(pinsDown);
     }
@@ -75,21 +64,16 @@ public class Game {
             if (pinsDown < TOTAL_PINS) {
                 currentTry = 2;
             } else {  // strike
-                resetFrame(1);
+                resetFrame();
             }
         } else {
-            resetFrame(2);
+            resetFrame();
         }
     }
 
-    private void resetFrame(int tries) {
+    private void resetFrame() {
         currentFrameIndex++;
         currentTry = 1;
-        lastFrame2PinsDown = lastFramePinsDown;
-        lastFramePinsDown = currentFramePinsDown;
-        lastFrame2Tries = lastFrameTries;
-        lastFrameTries = tries;
-        currentFramePinsDown = 0;
     }
 
     private Optional<Frame> prevFrame() {
