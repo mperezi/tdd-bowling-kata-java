@@ -19,7 +19,8 @@ public class Game {
     int score = 0;
 
     public Game() {
-        IntStream.range(0, TOTAL_FRAMES).forEach(i -> frames[i] = new Frame());
+        IntStream.range(0, TOTAL_FRAMES - 1).forEach(i -> frames[i] = new Frame());
+        frames[TOTAL_FRAMES - 1] = new LastFrame();
     }
 
     public void roll(int pinsDown) {
@@ -29,7 +30,9 @@ public class Game {
                     score += pinsDown;
                 }
             }
-            score += pinsDown;
+            if (currentFrame().tries < 2) {
+                score += pinsDown;
+            }
         }
         if (lastFrameWasSpare() && currentFrame().isFirstTry()) {
             score += pinsDown;
@@ -58,7 +61,7 @@ public class Game {
     }
 
     private void advanceFrame() {
-        if (currentFrame().isStrike() || currentFrame().tries == 2) {
+        if (currentFrame().isFinished()) {
             currentFrameIndex++;
         }
     }
@@ -100,6 +103,23 @@ public class Game {
 
         boolean isStrike() {
             return pinsDown == TOTAL_PINS && tries == 1;
+        }
+
+        boolean isFinished() {
+            return isStrike() || tries == 2;
+        }
+    }
+
+    private static class LastFrame extends Frame {
+        @Override
+        void roll(int pinsDown) {
+            this.pinsDown += pinsDown;
+            tries++;
+        }
+
+        @Override
+        boolean isFinished() {
+            return tries == 3;
         }
     }
 

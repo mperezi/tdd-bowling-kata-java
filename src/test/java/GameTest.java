@@ -15,7 +15,6 @@ public class GameTest {
 
         assertThat(game.score()).isZero();
     }
-
     @Test
     public void testMostConsistentPlayer() {
         var game = new Game();
@@ -70,4 +69,12 @@ public class GameTest {
         assertThat(game.score()).isEqualTo(42);
     }
 
+    @Test
+    public void testPerfectGame() {
+        var game = new Game();
+
+        IntStream.rangeClosed(1, 12). forEach(v -> game.roll(10));
+
+        assertThat(game.score()).isEqualTo(300);
+    }
 }
