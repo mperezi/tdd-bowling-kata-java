@@ -1,6 +1,8 @@
 package com.example.kata;
 
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 /**
@@ -16,8 +18,6 @@ public class Game {
 
     int currentFrameIndex;
 
-    int score = 0;
-
     public Game() {
         IntStream.range(0, TOTAL_FRAMES - 1).forEach(i -> frames[i] = new Frame());
         frames[TOTAL_FRAMES - 1] = new LastFrame();
@@ -27,21 +27,24 @@ public class Game {
         if (lastFrameWasStrike()) {
             if (lastFrame2WasStrikeToo()) {
                 if (currentFrame().isFirstTry()) {
-                    score += pinsDown;
+                    prevFrame(currentFrameIndex - 1).ifPresent(applyBonus(pinsDown));
                 }
             }
             if (currentFrame().tries < 2) {
-                score += pinsDown;
+                prevFrame().ifPresent(applyBonus(pinsDown));
             }
         }
         if (lastFrameWasSpare() && currentFrame().isFirstTry()) {
-            score += pinsDown;
+            prevFrame().ifPresent(applyBonus(pinsDown));
         }
 
         currentFrame().roll(pinsDown);
-        score += pinsDown;
 
         advanceFrame();
+    }
+
+    private static Consumer<Frame> applyBonus(int bonus) {
+        return f -> f.value += bonus;
     }
 
     private Frame currentFrame() {
@@ -77,17 +80,20 @@ public class Game {
     }
 
     public int score() {
-        return score;
+        return Arrays.stream(frames).mapToInt(Frame::getValue).sum();
     }
 
     private static class Frame {
 
         int pinsDown;
 
+        int value;
+
         int tries;
 
         void roll(int pinsDown) {
             this.pinsDown += pinsDown;
+            value += pinsDown;
             if (tries == 0 || pinsDown < TOTAL_PINS) {
                 tries++;
             }
@@ -108,12 +114,17 @@ public class Game {
         boolean isFinished() {
             return isStrike() || tries == 2;
         }
+
+        public int getValue() {
+            return value;
+        }
     }
 
     private static class LastFrame extends Frame {
         @Override
         void roll(int pinsDown) {
             this.pinsDown += pinsDown;
+            value += pinsDown;
             tries++;
         }
 
