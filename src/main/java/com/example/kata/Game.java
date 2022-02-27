@@ -10,9 +10,9 @@ import java.util.stream.IntStream;
  */
 public class Game {
 
-    private static final int TOTAL_FRAMES = 10;
+    static final int TOTAL_FRAMES = 10;
 
-    private static final int TOTAL_PINS = 10;
+    static final int TOTAL_PINS = 10;
 
     Frame[] frames = new Frame[TOTAL_FRAMES];
 
@@ -81,57 +81,6 @@ public class Game {
 
     public int score() {
         return Arrays.stream(frames).mapToInt(Frame::getValue).sum();
-    }
-
-    private static class Frame {
-
-        int pinsDown;
-
-        int value;
-
-        int tries;
-
-        void roll(int pinsDown) {
-            this.pinsDown += pinsDown;
-            value += pinsDown;
-            if (tries == 0 || pinsDown < TOTAL_PINS) {
-                tries++;
-            }
-        }
-
-        boolean isFirstTry() {
-            return tries == 0;
-        }
-
-        boolean isSpare() {
-            return pinsDown == TOTAL_PINS && tries == 2;
-        }
-
-        boolean isStrike() {
-            return pinsDown == TOTAL_PINS && tries == 1;
-        }
-
-        boolean isFinished() {
-            return isStrike() || tries == 2;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
-
-    private static class LastFrame extends Frame {
-        @Override
-        void roll(int pinsDown) {
-            this.pinsDown += pinsDown;
-            value += pinsDown;
-            tries++;
-        }
-
-        @Override
-        boolean isFinished() {
-            return tries == 3;
-        }
     }
 
 }
