@@ -1,9 +1,16 @@
 package com.example.kata;
 
+import java.util.Optional;
+import java.util.stream.IntStream;
+
 /**
  * Created by colm on 3/21/17.
  */
 public class Game {
+
+    Frame[] frames = new Frame[10];
+
+    int currentFrame;
 
     int score = 0;
 
@@ -18,6 +25,10 @@ public class Game {
     int lastFrameTries;
 
     int currentFramePinsDown;
+
+    public Game() {
+        IntStream.range(0, 10).forEach(i -> frames[i] = new Frame());
+    }
 
     public void roll(int pinsDown) {
         if (lastFrameWasStrike()) {
@@ -71,7 +82,36 @@ public class Game {
         currentFramePinsDown = 0;
     }
 
+    private Optional<Frame> prevFrame(int frameNumber) {
+        return frameNumber > 0
+                ? Optional.of(frames[frameNumber - 1])
+                : Optional.empty();
+    }
+
     public int score() {
         return score;
     }
+
+    private static class Frame {
+
+        int pinsDown;
+
+        int tries = 1;
+
+        void roll(int pinsDown) {
+            this.pinsDown += pinsDown;
+            if (tries < 2 && pinsDown < 10) {
+                tries++;
+            }
+        }
+
+        boolean isSpare() {
+            return pinsDown == 10 && tries == 2;
+        }
+
+        boolean isStrike() {
+            return pinsDown == 10 && tries == 1;
+        }
+    }
+
 }
