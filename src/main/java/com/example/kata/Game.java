@@ -14,7 +14,7 @@ public class Game {
 
     Frame[] frames = new Frame[TOTAL_FRAMES];
 
-    int currentFrame;
+    int currentFrameIndex;
 
     int score = 0;
 
@@ -37,33 +37,37 @@ public class Game {
     public void roll(int pinsDown) {
         if (lastFrameWasStrike()) {
             if (lastFrame2WasStrikeToo()) {
-                if (currentTry == 1) {
+                if (currentFrame().tries == 1) {
                     score += pinsDown;
                 }
             }
             score += pinsDown;
         }
-        if (lastFrameWasSpare() && currentTry == 1) {
+        if (lastFrameWasSpare() && currentFrame().tries == 1) {
             score += pinsDown;
         }
 
-        frames[currentFrame].roll(pinsDown);
+        currentFrame().roll(pinsDown);
         score += pinsDown;
         currentFramePinsDown += pinsDown;
 
         advanceFrame(pinsDown);
     }
 
+    private Frame currentFrame() {
+        return frames[currentFrameIndex];
+    }
+
     private boolean lastFrameWasSpare() {
-        return lastFramePinsDown == TOTAL_PINS && lastFrameTries == 2;
+        return prevFrame().map(Frame::isSpare).orElse(false);
     }
 
     private boolean lastFrameWasStrike() {
-        return lastFramePinsDown == TOTAL_PINS && lastFrameTries == 1;
+        return prevFrame().map(Frame::isStrike).orElse(false);
     }
 
     private boolean lastFrame2WasStrikeToo() {
-        return lastFrame2PinsDown == TOTAL_PINS && lastFrameTries == 1;
+        return prevFrame(currentFrameIndex - 1).map(Frame::isStrike).orElse(false);
     }
 
     private void advanceFrame(int pinsDown) {
@@ -79,13 +83,17 @@ public class Game {
     }
 
     private void resetFrame(int tries) {
-        currentFrame++;
+        currentFrameIndex++;
         currentTry = 1;
         lastFrame2PinsDown = lastFramePinsDown;
         lastFramePinsDown = currentFramePinsDown;
         lastFrame2Tries = lastFrameTries;
         lastFrameTries = tries;
         currentFramePinsDown = 0;
+    }
+
+    private Optional<Frame> prevFrame() {
+        return prevFrame(currentFrameIndex);
     }
 
     private Optional<Frame> prevFrame(int frameNumber) {
