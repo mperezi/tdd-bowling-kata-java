@@ -8,7 +8,11 @@ import java.util.stream.IntStream;
  */
 public class Game {
 
-    Frame[] frames = new Frame[10];
+    private static final int TOTAL_FRAMES = 10;
+
+    private static final int TOTAL_PINS = 10;
+
+    Frame[] frames = new Frame[TOTAL_FRAMES];
 
     int currentFrame;
 
@@ -27,7 +31,7 @@ public class Game {
     int currentFramePinsDown;
 
     public Game() {
-        IntStream.range(0, 10).forEach(i -> frames[i] = new Frame());
+        IntStream.range(0, TOTAL_FRAMES).forEach(i -> frames[i] = new Frame());
     }
 
     public void roll(int pinsDown) {
@@ -50,20 +54,20 @@ public class Game {
     }
 
     private boolean lastFrameWasSpare() {
-        return lastFramePinsDown == 10 && lastFrameTries == 2;
+        return lastFramePinsDown == TOTAL_PINS && lastFrameTries == 2;
     }
 
     private boolean lastFrameWasStrike() {
-        return lastFramePinsDown == 10 && lastFrameTries == 1;
+        return lastFramePinsDown == TOTAL_PINS && lastFrameTries == 1;
     }
 
     private boolean lastFrame2WasStrikeToo() {
-        return lastFrame2PinsDown == 10 && lastFrameTries == 1;
+        return lastFrame2PinsDown == TOTAL_PINS && lastFrameTries == 1;
     }
 
     private void advanceFrame(int pinsDown) {
         if (currentTry == 1) {
-            if (pinsDown < 10) {
+            if (pinsDown < TOTAL_PINS) {
                 currentTry = 2;
             } else {  // strike
                 resetFrame(1);
@@ -100,17 +104,17 @@ public class Game {
 
         void roll(int pinsDown) {
             this.pinsDown += pinsDown;
-            if (tries < 2 && pinsDown < 10) {
+            if (tries < 2 && pinsDown < TOTAL_PINS) {
                 tries++;
             }
         }
 
         boolean isSpare() {
-            return pinsDown == 10 && tries == 2;
+            return pinsDown == TOTAL_PINS && tries == 2;
         }
 
         boolean isStrike() {
-            return pinsDown == 10 && tries == 1;
+            return pinsDown == TOTAL_PINS && tries == 1;
         }
     }
 
