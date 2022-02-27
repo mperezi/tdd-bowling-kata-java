@@ -47,6 +47,7 @@ public class Game {
             score += pinsDown;
         }
 
+        frames[currentFrame].roll(pinsDown);
         score += pinsDown;
         currentFramePinsDown += pinsDown;
 
@@ -78,6 +79,7 @@ public class Game {
     }
 
     private void resetFrame(int tries) {
+        currentFrame++;
         currentTry = 1;
         lastFrame2PinsDown = lastFramePinsDown;
         lastFramePinsDown = currentFramePinsDown;
