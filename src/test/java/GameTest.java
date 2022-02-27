@@ -58,4 +58,16 @@ public class GameTest {
         assertThat(game.score()).isEqualTo(45);
     }
 
+    @Test
+    public void testSpareAndThenStrike() {
+        var game = new Game();
+
+        game.roll(7); game.roll(3); // spare
+        game.roll(10); // strike
+        game.roll(3);
+        game.roll(3);
+
+        assertThat(game.score()).isEqualTo(42);
+    }
+
 }
