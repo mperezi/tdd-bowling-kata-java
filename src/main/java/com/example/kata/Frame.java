@@ -12,6 +12,8 @@ class Frame {
 
     int tries;
 
+    int[] rolls = new int[2];
+
     public Frame(int id) {
         this.id = id;
     }
@@ -21,6 +23,7 @@ class Frame {
 
         this.pinsDown += pinsDown;
         value += pinsDown;
+        rolls[tries] = pinsDown;
         if (tries == 0 || pinsDown < Game.TOTAL_PINS) {
             tries++;
         }
@@ -55,9 +58,14 @@ class Frame {
 
     @Override
     public String toString() {
-        String s = String.valueOf(pinsDown);
-        if (isSpare())  s = "/";
-        if (isStrike()) s = "X";
+        String s;
+        if (isStrike()) {
+            s = "X";
+        } else if (isSpare()) {
+            s = rolls[0] + "/";
+        } else {
+            s = "" + rolls[0] + rolls[1];
+        }
         return String.format("%d(%s)", id, s);
     }
 }
@@ -101,25 +109,27 @@ class LastFrame extends Frame {
 
     @Override
     public String toString() {
+        String s;
         if (Arrays.stream(rolls).allMatch(r -> r == Game.TOTAL_PINS)) {
-            return "XXX";
+            s = "XXX";
         } else if (rolls[0] + rolls[1] == 2 * Game.TOTAL_PINS) {
-            return "XX" + rolls[2];
+            s = "XX" + rolls[2];
         } else if (rolls[0] == Game.TOTAL_PINS) {
             if (rolls[1] + rolls[2] == Game.TOTAL_PINS) {
-                return "X/";
+                s = "X" + rolls[1] + "/";
             } else {
-                return "X" + rolls[1] + rolls[2];
+                s = "X" + rolls[1] + rolls[2];
             }
         } else if (rolls[0] + rolls[1] == Game.TOTAL_PINS) {
             if (rolls[2] == Game.TOTAL_PINS) {
-                return "/X";
+                s = rolls[0] + "/X";
             } else {
-                return "/" + rolls[2];
+                s = rolls[0] + "/" + rolls[2];
             }
         } else {
-            return String.valueOf(pinsDown);
+            s =  "" + rolls[0] + rolls[1];
         }
+        return String.format("%d(%s)", id, s);
     }
 }
 
