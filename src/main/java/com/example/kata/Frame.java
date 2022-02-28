@@ -85,12 +85,14 @@ class LastFrame extends Frame {
     }
 
     private void validateRoll(int pinsDown) {
-        if (this.pinsDown == Game.TOTAL_PINS || this.pinsDown == 2 * Game.TOTAL_PINS) {
-            if (pinsDown > Game.TOTAL_PINS) {
-                throw new InvalidScoreException("Pins down " + pinsDown + " not allowed for frame " + id);
-            }
-        } else {
+        if (pinsDown > Game.TOTAL_PINS) {
+            throw new InvalidScoreException("Pins down " + pinsDown + " not allowed for frame " + id);
+        }
+        if (this.pinsDown % Game.TOTAL_PINS != 0) {  // not X or XX
             int p = this.pinsDown + pinsDown;
+            if (this.pinsDown > Game.TOTAL_PINS) {   // strike in first roll
+                p -= Game.TOTAL_PINS;
+            }
             if (p > Game.TOTAL_PINS) {
                 throw new InvalidScoreException("Total pins down " + p + " not allowed for frame " + id);
             }
@@ -102,15 +104,19 @@ class LastFrame extends Frame {
         if (Arrays.stream(rolls).allMatch(r -> r == Game.TOTAL_PINS)) {
             return "XXX";
         } else if (rolls[0] + rolls[1] == 2 * Game.TOTAL_PINS) {
-            return "XX" + pinsDown;
+            return "XX" + rolls[2];
         } else if (rolls[0] == Game.TOTAL_PINS) {
             if (rolls[1] + rolls[2] == Game.TOTAL_PINS) {
                 return "X/";
             } else {
-                return "X" + pinsDown;
+                return "X" + rolls[1] + rolls[2];
             }
         } else if (rolls[0] + rolls[1] == Game.TOTAL_PINS) {
-            return "/" + pinsDown;
+            if (rolls[2] == Game.TOTAL_PINS) {
+                return "/X";
+            } else {
+                return "/" + rolls[2];
+            }
         } else {
             return String.valueOf(pinsDown);
         }
