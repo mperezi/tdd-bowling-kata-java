@@ -1,5 +1,7 @@
 package com.example.kata;
 
+import java.util.Arrays;
+
 class Frame {
 
     final int id;
@@ -50,9 +52,19 @@ class Frame {
     public int getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        String s = String.valueOf(pinsDown);
+        if (isSpare())  s = "/";
+        if (isStrike()) s = "X";
+        return String.format("%d(%s)", id, s);
+    }
 }
 
 class LastFrame extends Frame {
+
+    int[] rolls = new int[3];
 
     public LastFrame() {
         super(Game.TOTAL_FRAMES);
@@ -64,7 +76,7 @@ class LastFrame extends Frame {
 
         this.pinsDown += pinsDown;
         value += pinsDown;
-        tries++;
+        rolls[tries++] = pinsDown;
     }
 
     @Override
@@ -82,6 +94,25 @@ class LastFrame extends Frame {
             if (p > Game.TOTAL_PINS) {
                 throw new InvalidScoreException("Total pins down " + p + " not allowed for frame " + id);
             }
+        }
+    }
+
+    @Override
+    public String toString() {
+        if (Arrays.stream(rolls).allMatch(r -> r == Game.TOTAL_PINS)) {
+            return "XXX";
+        } else if (rolls[0] + rolls[1] == 2 * Game.TOTAL_PINS) {
+            return "XX" + pinsDown;
+        } else if (rolls[0] == Game.TOTAL_PINS) {
+            if (rolls[1] + rolls[2] == Game.TOTAL_PINS) {
+                return "X/";
+            } else {
+                return "X" + pinsDown;
+            }
+        } else if (rolls[0] + rolls[1] == Game.TOTAL_PINS) {
+            return "/" + pinsDown;
+        } else {
+            return String.valueOf(pinsDown);
         }
     }
 }
