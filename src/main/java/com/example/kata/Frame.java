@@ -60,6 +60,8 @@ class LastFrame extends Frame {
 
     @Override
     void roll(int pinsDown) {
+        validateRoll(pinsDown);
+
         this.pinsDown += pinsDown;
         value += pinsDown;
         tries++;
@@ -68,6 +70,19 @@ class LastFrame extends Frame {
     @Override
     boolean isFinished() {
         return tries == 2 && pinsDown < Game.TOTAL_PINS || tries == 3;
+    }
+
+    private void validateRoll(int pinsDown) {
+        if (this.pinsDown == Game.TOTAL_PINS || this.pinsDown == 2 * Game.TOTAL_PINS) {
+            if (pinsDown > Game.TOTAL_PINS) {
+                throw new InvalidScoreException("Pins down " + pinsDown + " not allowed for frame " + id);
+            }
+        } else {
+            int p = this.pinsDown + pinsDown;
+            if (p > Game.TOTAL_PINS) {
+                throw new InvalidScoreException("Total pins down " + p + " not allowed for frame " + id);
+            }
+        }
     }
 }
 
