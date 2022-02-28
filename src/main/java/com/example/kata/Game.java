@@ -24,23 +24,31 @@ public class Game {
     }
 
     public void roll(int pinsDown) {
-        if (prevFrame().isStrike()) {
-            if (prevFrame(2).isStrike()) {
-                if (currentFrame().isFirstTry()) {
-                    prevFrame(2).value += pinsDown;
-                }
-            }
-            if (currentFrame().tries < 2) {
-                prevFrame().value += pinsDown;
-            }
-        }
-        if (prevFrame().isSpare() && currentFrame().isFirstTry()) {
-            prevFrame().value += pinsDown;
-        }
+        applyBonusStrike(pinsDown);
+        applyBonusSpare(pinsDown);
 
         currentFrame().roll(pinsDown);
 
         advanceFrame();
+    }
+
+    private void applyBonusStrike(int pinsDown) {
+        if (prevFrame().isStrike()) {
+            // strike bonus only applies to next two rolls
+            if (currentFrame().tries < 2) {
+                prevFrame().value += pinsDown;
+            }
+            if (prevFrame(2).isStrike() && currentFrame().isFirstTry()) {
+                prevFrame(2).value += pinsDown;
+            }
+        }
+    }
+
+    private void applyBonusSpare(int pinsDown) {
+        // spare bonus only applies to next roll
+        if (prevFrame().isSpare() && currentFrame().isFirstTry()) {
+            prevFrame().value += pinsDown;
+        }
     }
 
     private Frame currentFrame() {
