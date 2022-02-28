@@ -1,18 +1,15 @@
 package com.example.kata;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 class Frame {
 
     final int id;
 
-    int pinsDown;
+    List<Integer> pinsDown = new ArrayList<>();
 
-    int value;
-
-    int tries;
-
-    int[] rolls = new int[2];
+    int bonus;
 
     public Frame(int id) {
         this.id = id;
@@ -20,85 +17,88 @@ class Frame {
 
     void roll(int pinsDown) {
         validateRoll(pinsDown);
-
-        this.pinsDown += pinsDown;
-        value += pinsDown;
-        rolls[tries] = pinsDown;
-        if (tries == 0 || pinsDown < Game.TOTAL_PINS) {
-            tries++;
-        }
+        this.pinsDown.add(pinsDown);
     }
 
-    private void validateRoll(int pinsDown) {
-        int p = this.pinsDown + pinsDown;
+    protected void validateRoll(int pinsDown) {
+        int p = totalPinsDown() + pinsDown;
         if (p > Game.TOTAL_PINS) {
             throw new InvalidScoreException("Total number of pins down " + p + " not allowed for frame " + id);
         }
     }
 
     boolean isFirstTry() {
-        return tries == 0;
+        return pinsDown.isEmpty();
     }
 
     boolean isSpare() {
-        return pinsDown == Game.TOTAL_PINS && tries == 2;
+        return totalPinsDown() == Game.TOTAL_PINS && tries() == 2;
     }
 
     boolean isStrike() {
-        return pinsDown == Game.TOTAL_PINS && tries == 1;
+        return totalPinsDown() == Game.TOTAL_PINS && tries() == 1;
     }
 
     boolean isFinished() {
-        return isStrike() || tries == 2;
+        return isStrike() || tries() == 2;
     }
 
     public int getValue() {
-        return value;
+        return totalPinsDown() + bonus;
+    }
+
+    public int tries() {
+        return pinsDown.size();
+    }
+
+    int totalPinsDown() {
+        return pinsDown.stream().mapToInt(Integer::intValue).sum();
     }
 
     @Override
     public String toString() {
-        String s;
-        if (isStrike()) {
-            s = "X";
-        } else if (isSpare()) {
-            s = rolls[0] + "/";
-        } else {
-            s = "" + rolls[0] + rolls[1];
+        String score = scoreString();
+        if (!score.equals("X")) {
+            score += "-".repeat(2 - score.length());  // pad missing rolls if any
         }
-        return String.format("%d(%s)", id, s);
+        return String.format("%d(%s)", id, score);
+    }
+
+    String scoreString() {
+        var result = new StringBuilder();
+        int prev = 0;
+        for (int p : pinsDown) {
+            if (p == Game.TOTAL_PINS) {
+                result.append("X");
+            } else if (prev + p == Game.TOTAL_PINS) {
+                result.append("/");
+            } else {
+                result.append(p);
+                prev = p;
+            }
+        }
+        return result.toString();
     }
 }
 
 class LastFrame extends Frame {
-
-    int[] rolls = new int[3];
 
     public LastFrame() {
         super(Game.TOTAL_FRAMES);
     }
 
     @Override
-    void roll(int pinsDown) {
-        validateRoll(pinsDown);
-
-        this.pinsDown += pinsDown;
-        value += pinsDown;
-        rolls[tries++] = pinsDown;
-    }
-
-    @Override
     boolean isFinished() {
-        return tries == 2 && pinsDown < Game.TOTAL_PINS || tries == 3;
+        return tries() == 2 && totalPinsDown() < Game.TOTAL_PINS || tries() == 3;
     }
 
-    private void validateRoll(int pinsDown) {
+    protected void validateRoll(int pinsDown) {
         if (pinsDown > Game.TOTAL_PINS) {
             throw new InvalidScoreException("Pins down " + pinsDown + " not allowed for frame " + id);
         }
-        if (this.pinsDown % Game.TOTAL_PINS != 0) {  // not X or XX
-            int p = this.pinsDown + pinsDown;
-            if (this.pinsDown > Game.TOTAL_PINS) {   // strike in first roll
+        if (totalPinsDown() % Game.TOTAL_PINS != 0) {  // not X or XX
+            int p = totalPinsDown() + pinsDown;
+            if (totalPinsDown() > Game.TOTAL_PINS) {   // strike in first roll
                 p -= Game.TOTAL_PINS;
             }
             if (p > Game.TOTAL_PINS) {
@@ -109,27 +109,11 @@ class LastFrame extends Frame {
 
     @Override
     public String toString() {
-        String s;
-        if (Arrays.stream(rolls).allMatch(r -> r == Game.TOTAL_PINS)) {
-            s = "XXX";
-        } else if (rolls[0] + rolls[1] == 2 * Game.TOTAL_PINS) {
-            s = "XX" + rolls[2];
-        } else if (rolls[0] == Game.TOTAL_PINS) {
-            if (rolls[1] + rolls[2] == Game.TOTAL_PINS) {
-                s = "X" + rolls[1] + "/";
-            } else {
-                s = "X" + rolls[1] + rolls[2];
-            }
-        } else if (rolls[0] + rolls[1] == Game.TOTAL_PINS) {
-            if (rolls[2] == Game.TOTAL_PINS) {
-                s = rolls[0] + "/X";
-            } else {
-                s = rolls[0] + "/" + rolls[2];
-            }
-        } else {
-            s =  "" + rolls[0] + rolls[1];
+        String score = scoreString();
+        if (!score.matches("\\d{2}")) {
+            score += "-".repeat(3 - score.length());  // pad missing rolls if any
         }
-        return String.format("%d(%s)", id, s);
+        return String.format("%d(%s)", id, score);
     }
 }
 

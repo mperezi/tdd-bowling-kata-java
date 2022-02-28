@@ -3,6 +3,8 @@ package com.example.kata;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.joining;
+
 /**
  * Created by colm on 3/21/17.
  */
@@ -47,11 +49,11 @@ public class Game {
     private void applyBonusStrike(int pinsDown) {
         if (prevFrame().isStrike()) {
             // strike bonus only applies to next two rolls
-            if (currentFrame().tries < 2) {
-                prevFrame().value += pinsDown;
+            if (currentFrame().tries() < 2) {
+                prevFrame().bonus += pinsDown;
             }
             if (prevFrame(2).isStrike() && currentFrame().isFirstTry()) {
-                prevFrame(2).value += pinsDown;
+                prevFrame(2).bonus += pinsDown;
             }
         }
     }
@@ -59,7 +61,7 @@ public class Game {
     private void applyBonusSpare(int pinsDown) {
         // spare bonus only applies to next roll
         if (prevFrame().isSpare() && currentFrame().isFirstTry()) {
-            prevFrame().value += pinsDown;
+            prevFrame().bonus += pinsDown;
         }
     }
 
@@ -86,6 +88,6 @@ public class Game {
 
     @Override
     public String toString() {
-        return Arrays.toString(frames);
+        return Arrays.stream(frames).map(Frame::toString).collect(joining(" "));
     }
 }
