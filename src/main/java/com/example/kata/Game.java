@@ -1,14 +1,14 @@
 package com.example.kata;
 
 import java.util.Arrays;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 /**
  * Created by colm on 3/21/17.
  */
 public class Game {
+
+    private static final Frame INVALID_FRAME = new InvalidFrame();
 
     static final int TOTAL_FRAMES = 10;
 
@@ -27,15 +27,15 @@ public class Game {
         if (lastFrameWasStrike()) {
             if (lastFrame2WasStrikeToo()) {
                 if (currentFrame().isFirstTry()) {
-                    prevFrame(currentFrameIndex - 1).ifPresent(applyBonus(pinsDown));
+                    prevFrame(currentFrameIndex - 1).value += pinsDown;
                 }
             }
             if (currentFrame().tries < 2) {
-                prevFrame().ifPresent(applyBonus(pinsDown));
+                prevFrame().value += pinsDown;
             }
         }
         if (lastFrameWasSpare() && currentFrame().isFirstTry()) {
-            prevFrame().ifPresent(applyBonus(pinsDown));
+            prevFrame().value += pinsDown;
         }
 
         currentFrame().roll(pinsDown);
@@ -43,24 +43,20 @@ public class Game {
         advanceFrame();
     }
 
-    private static Consumer<Frame> applyBonus(int bonus) {
-        return f -> f.value += bonus;
-    }
-
     private Frame currentFrame() {
         return frames[currentFrameIndex];
     }
 
     private boolean lastFrameWasSpare() {
-        return prevFrame().map(Frame::isSpare).orElse(false);
+        return prevFrame().isSpare();
     }
 
     private boolean lastFrameWasStrike() {
-        return prevFrame().map(Frame::isStrike).orElse(false);
+        return prevFrame().isStrike();
     }
 
     private boolean lastFrame2WasStrikeToo() {
-        return prevFrame(currentFrameIndex - 1).map(Frame::isStrike).orElse(false);
+        return prevFrame(currentFrameIndex - 1).isStrike();
     }
 
     private void advanceFrame() {
@@ -69,14 +65,14 @@ public class Game {
         }
     }
 
-    private Optional<Frame> prevFrame() {
+    private Frame prevFrame() {
         return prevFrame(currentFrameIndex);
     }
 
-    private Optional<Frame> prevFrame(int frameNumber) {
+    private Frame prevFrame(int frameNumber) {
         return frameNumber > 0
-                ? Optional.of(frames[frameNumber - 1])
-                : Optional.empty();
+                ? frames[frameNumber - 1]
+                : INVALID_FRAME;
     }
 
     public int score() {

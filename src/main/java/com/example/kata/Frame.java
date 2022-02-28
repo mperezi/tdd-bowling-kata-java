@@ -38,6 +38,7 @@ class Frame {
 }
 
 class LastFrame extends Frame {
+
     @Override
     void roll(int pinsDown) {
         this.pinsDown += pinsDown;
@@ -48,5 +49,18 @@ class LastFrame extends Frame {
     @Override
     boolean isFinished() {
         return tries == 3;
+    }
+}
+
+class InvalidFrame extends Frame {
+
+    @Override
+    boolean isStrike() {
+        return false;
+    }
+
+    @Override
+    boolean isSpare() {
+        return false;
     }
 }
