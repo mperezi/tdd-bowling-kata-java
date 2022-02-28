@@ -24,17 +24,17 @@ public class Game {
     }
 
     public void roll(int pinsDown) {
-        if (lastFrameWasStrike()) {
-            if (lastFrame2WasStrikeToo()) {
+        if (prevFrame().isStrike()) {
+            if (prevFrame(2).isStrike()) {
                 if (currentFrame().isFirstTry()) {
-                    prevFrame(currentFrameIndex - 1).value += pinsDown;
+                    prevFrame(2).value += pinsDown;
                 }
             }
             if (currentFrame().tries < 2) {
                 prevFrame().value += pinsDown;
             }
         }
-        if (lastFrameWasSpare() && currentFrame().isFirstTry()) {
+        if (prevFrame().isSpare() && currentFrame().isFirstTry()) {
             prevFrame().value += pinsDown;
         }
 
@@ -47,18 +47,6 @@ public class Game {
         return frames[currentFrameIndex];
     }
 
-    private boolean lastFrameWasSpare() {
-        return prevFrame().isSpare();
-    }
-
-    private boolean lastFrameWasStrike() {
-        return prevFrame().isStrike();
-    }
-
-    private boolean lastFrame2WasStrikeToo() {
-        return prevFrame(currentFrameIndex - 1).isStrike();
-    }
-
     private void advanceFrame() {
         if (currentFrame().isFinished()) {
             currentFrameIndex++;
@@ -66,12 +54,13 @@ public class Game {
     }
 
     private Frame prevFrame() {
-        return prevFrame(currentFrameIndex);
+        return prevFrame(1);
     }
 
-    private Frame prevFrame(int frameNumber) {
-        return frameNumber > 0
-                ? frames[frameNumber - 1]
+    private Frame prevFrame(int framesBack) {
+        int frameIndex = currentFrameIndex - framesBack;
+        return frameIndex >= 0
+                ? frames[frameIndex]
                 : INVALID_FRAME;
     }
 
