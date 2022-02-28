@@ -19,11 +19,13 @@ public class Game {
     int currentFrameIndex;
 
     public Game() {
-        IntStream.range(0, TOTAL_FRAMES - 1).forEach(i -> frames[i] = new Frame());
+        IntStream.range(0, TOTAL_FRAMES - 1).forEach(i -> frames[i] = new Frame(i + 1));
         frames[TOTAL_FRAMES - 1] = new LastFrame();
     }
 
     public void roll(int pinsDown) {
+        validateGameStatus();
+
         applyBonusStrike(pinsDown);
         applyBonusSpare(pinsDown);
 
@@ -34,6 +36,12 @@ public class Game {
 
     public int score() {
         return Arrays.stream(frames).mapToInt(Frame::getValue).sum();
+    }
+
+    private void validateGameStatus() {
+        if (currentFrameIndex >= TOTAL_FRAMES) {
+            throw new GameOverException();
+        }
     }
 
     private void applyBonusStrike(int pinsDown) {

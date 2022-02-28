@@ -1,4 +1,5 @@
-import com.example.kata.Game;
+package com.example.kata;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;

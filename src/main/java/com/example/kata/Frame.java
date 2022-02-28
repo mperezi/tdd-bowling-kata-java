@@ -2,17 +2,32 @@ package com.example.kata;
 
 class Frame {
 
+    final int id;
+
     int pinsDown;
 
     int value;
 
     int tries;
 
+    public Frame(int id) {
+        this.id = id;
+    }
+
     void roll(int pinsDown) {
+        validateRoll(pinsDown);
+
         this.pinsDown += pinsDown;
         value += pinsDown;
         if (tries == 0 || pinsDown < Game.TOTAL_PINS) {
             tries++;
+        }
+    }
+
+    private void validateRoll(int pinsDown) {
+        int p = this.pinsDown + pinsDown;
+        if (p > Game.TOTAL_PINS) {
+            throw new InvalidScoreException("Total number of pins down " + p + " not allowed for frame " + id);
         }
     }
 
@@ -39,6 +54,10 @@ class Frame {
 
 class LastFrame extends Frame {
 
+    public LastFrame() {
+        super(Game.TOTAL_FRAMES);
+    }
+
     @Override
     void roll(int pinsDown) {
         this.pinsDown += pinsDown;
@@ -48,11 +67,15 @@ class LastFrame extends Frame {
 
     @Override
     boolean isFinished() {
-        return tries == 3;
+        return tries == 2 && pinsDown < Game.TOTAL_PINS || tries == 3;
     }
 }
 
 class InvalidFrame extends Frame {
+
+    public InvalidFrame() {
+        super(-1);
+    }
 
     @Override
     boolean isStrike() {
