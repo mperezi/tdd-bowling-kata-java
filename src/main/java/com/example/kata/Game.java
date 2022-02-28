@@ -32,6 +32,10 @@ public class Game {
         advanceFrame();
     }
 
+    public int score() {
+        return Arrays.stream(frames).mapToInt(Frame::getValue).sum();
+    }
+
     private void applyBonusStrike(int pinsDown) {
         if (prevFrame().isStrike()) {
             // strike bonus only applies to next two rolls
@@ -55,12 +59,6 @@ public class Game {
         return frames[currentFrameIndex];
     }
 
-    private void advanceFrame() {
-        if (currentFrame().isFinished()) {
-            currentFrameIndex++;
-        }
-    }
-
     private Frame prevFrame() {
         return prevFrame(1);
     }
@@ -72,8 +70,10 @@ public class Game {
                 : INVALID_FRAME;
     }
 
-    public int score() {
-        return Arrays.stream(frames).mapToInt(Frame::getValue).sum();
+    private void advanceFrame() {
+        if (currentFrame().isFinished()) {
+            currentFrameIndex++;
+        }
     }
 
 }
